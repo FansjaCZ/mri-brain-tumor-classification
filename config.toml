@@ -1,0 +1,16 @@
+[main]
+device = "cuda"
+
+[data]
+dataset_dir = "data/dataset/"
+image_size = [224, 224]
+
+[train]
+batch_size = 4 #8
+learning_rate = 0.001 #0.001
+epochs = 2 #30
+
+[format]
+percentage_decimals = 1
+loss_decimals = 2
+time_decimals = 2
