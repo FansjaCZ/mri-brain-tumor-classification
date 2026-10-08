@@ -3,6 +3,7 @@ from torch import nn
 class Model(nn.Module):
     def __init__(self, im_size):
         super().__init__()
+        post_im_size = (im_size[0]/(2**5), im_size[1]/(2**5))
         self.softmax = nn.Softmax(1)
         self.block1 = nn.Sequential(
             nn.Conv2d(1, 16, 3, 1, 1),
@@ -48,7 +49,7 @@ class Model(nn.Module):
         )
         self.network = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(12544, 512),
+            nn.Linear(int(256*post_im_size[0]*post_im_size[1]), 512),
             nn.ReLU(),
             nn.Linear(512, 512),
             nn.ReLU(),
