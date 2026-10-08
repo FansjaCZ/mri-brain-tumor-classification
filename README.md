@@ -1,39 +1,38 @@
 # MRI brain tumor classification
 ## Introduction
 The model can identify four types of brain tumor (glioma tumor, meningioma tumor, pituitary tumor and no tumor) from 2D MRI grayscale images. This project contains saved model parameters and trainings which can be loaded and used.
-The whole project is written in Python and based on PyTorch. The CNN structure is based on the method proposed in an article by [https://www.mdpi.com/2076-3425/13/9/1320](Rasheed, Z. et al.), where it's stated that the method achieved an accuracy of 97.84%.
+The whole project is written in Python and based on PyTorch. The CNN structure is based on the method proposed in an article by [Rasheed, Z. et al.](https://www.mdpi.com/2076-3425/13/9/1320), where it's stated that the method achieved an accuracy of 97.84%.
 
 ## Setup
 First of all, make sure you have python 3.14.x and git installed on your device.
 
-Clone the repository to your target directory with 
+Clone the repository to your target directory with the following command in the terminal:
 ```
 git clone https://github.com/FansjaCZ/mri-brain-tumor-classification.git
 ```
-in the terminal.
 
-Before installing dependencies, make sure your GPU is compatible with cuda12.6. If your GPU is not NVIDIA, it may not be compatible by default. Install dependencies and setup the project using 
+Before installing dependencies, make sure your GPU is compatible with cuda12.6. If your GPU is not NVIDIA, it may not be compatible by default. Install dependencies and setup the project using the following command:
 ```
 pip install -e .
 ```
-or install the depenadncies manually from `pyproject.toml/`. A virtual environment is strongly recommended.
+Or install the depenadncies manually from `pyproject.toml/`. A virtual environment is strongly recommended.
 
 ## How to use
 There are two types of saves you can make: training saves and model saves. Training saves contain all data from the training, optimizer and model. Model saves contain only model parameters. Therefore model saves can be used during predictions and training saves can be used to save training progress and data. A full training save and model save have already been created in `.\data\training_saves\default.tar` and `.\data\model_saves\default.pt`.
 
 Set your preferences in `config.toml/`. The initial configuration will function, however you may need to set `device` to `"cpu"` instead of `"cuda"` if your device does not have a GPU or your GPU is not compatible with PyTorch. This may slow down training drastically, so it is not recommended.
 
-To start your own training run 
+To start your own training run the following command on the main directory
 ```
 python3 .\scripts\train_model.py .\data\training_saves\<your_training_name>.tar
 ``` 
-in the terminal on the main directory. It's good practice to use the `.tar` format to save trainings, as recommended by the official PyTorch documentation.
+It's good practice to use the `.tar` format to save trainings, as recommended by the official PyTorch documentation.
 
-To save model parameters from a training execute 
+To save model parameters from a training execute the command:
 ```
 python3 .\scripts\save_model.py .\data\training_saves\<your_training_name>.tar .\data\model_saves\<your_model_save_name>.pt
 ```
-in the terminal from the main directory. Use the `.pt` extension for good practice.
+Use the `.pt` extension for good practice.
 
 Scripts to run predictions on images using a model save will be added soon.
 
