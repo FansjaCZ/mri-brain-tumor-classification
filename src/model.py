@@ -47,14 +47,13 @@ class Model(nn.Module):
             nn.BatchNorm2d(256),
             nn.MaxPool2d(2, 2),
         )
-        self.network = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(int(256*post_im_size[0]*post_im_size[1]), 512),
+        self.global_avarage_pooling_2d = nn.AdaptiveAvgPool2d((1, 1))
+        self.flatten = nn.Flatten()
+        #self.block_dense1 = nn.Linear(int(256*post_im_size[0]*post_im_size[1]), 512)
+        self.block_dense1 = nn.Linear(256, 512)
+        self.block_dense2 = nn.Sequential(
             nn.ReLU(),
-            nn.Linear(512, 512),
-            nn.ReLU(),
-            nn.Linear(512, 512),
-            nn.ReLU(),
+            nn.Dropout(0.005),
             nn.Linear(512, 4)
         )
 
@@ -64,7 +63,10 @@ class Model(nn.Module):
         x = self.block3(x)
         x = self.block4(x)
         x = self.block5(x)
-        x = self.network(x)
+        x = self.global_avarage_pooling_2d(x)
+        x = self.flatten(x)
+        x = self.block_dense1(x)
+        x = self.block_dense2(x)
 
         if not self.training:
             x = self.softmax(x)

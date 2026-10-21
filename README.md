@@ -18,23 +18,21 @@ pip install -e .
 Or install the depenadncies manually from `pyproject.toml/`. A virtual environment is strongly recommended.
 
 ## How to use
-There are two types of saves you can make: training saves and model saves. Training saves contain all data from the training, optimizer and model. Model saves contain only model parameters. Therefore model saves can be used during predictions and training saves can be used to save training progress and data. A full training save and model save have already been created in `.\data\training_saves\default.tar` and `.\data\model_saves\default.pt`.
-
 Set your preferences in `config.toml/`. The initial configuration will function, however you may need to set `device` to `"cpu"` instead of `"cuda"` if your device does not have a GPU or your GPU is not compatible with PyTorch. This may slow down training drastically, so it is not recommended.
+
+The model can be trained using the `train_model.py` script. This will create a training save in the target directory. This training save can also be used to load the model for predictions. A full training save save was already created in `.\data\saves\default.tar`.
 
 To start your own training run the following command on the main directory
 ```
-python3 .\scripts\train_model.py .\data\training_saves\<your_training_name>.tar
+python3 .\scripts\train_model.py .\data\saves\<your_training_name>.tar
 ``` 
-It's good practice to use the `.tar` format to save trainings, as recommended by the official PyTorch documentation.
 
-To save model parameters from a training execute the command:
-```
-python3 .\scripts\save_model.py .\data\training_saves\<your_training_name>.tar .\data\model_saves\<your_model_save_name>.pt
-```
-Use the `.pt` extension for good practice.
+To run a prediction, the `use_model.py` script can be applied. This takes two arguments: the path to the image and the path to a training save to load parameters from. The second parameter is optional. By default the default training file will be used (set in the config).
 
-Scripts to run predictions on images using a model save will be added soon.
+To run a prediction on a test image from the nickparvar dataset run the following command
+```
+python3 .\scripts\use_model.py .\data\dataset\Testing\meningioma\Te-aug-me_1.jpg .\data\saves\<your_training_name>.tar
+```
 
 ## Specs
 The model was trained with the following specs:

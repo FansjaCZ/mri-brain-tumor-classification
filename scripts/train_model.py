@@ -14,7 +14,7 @@ import time
 import sys
 
 def main(path=None):
-    dataset = Nickparvar(str(Path(__file__).parent.parent / config.dataset_dir), config.im_size)
+    dataset = Nickparvar(config.dataset_dir, config.im_size)
     test_dataloader = DataLoader(dataset.get_test(), config.batch_size, True)
     train_dataloader = DataLoader(dataset.get_train(), config.batch_size, True)
 
@@ -23,8 +23,9 @@ def main(path=None):
 
     loss_fn = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), config.learning_rate)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min", factor=0.4, patience=1)
 
-    trainer = Trainer(model, optimizer, loss_fn, train_dataloader, test_dataloader)
+    trainer = Trainer(model, optimizer, scheduler, loss_fn, train_dataloader, test_dataloader)
 
     if path and Path(path).exists():
         trainer.load(path)

@@ -11,6 +11,7 @@ class Nickparvar():
             transforms.Resize(im_size),
             transforms.Grayscale(),
             transforms.ToTensor(),
+            #transforms.Normalize(),
         ])
 
         kagglehub.dataset_download("masoudnickparvar/brain-tumor-mri-dataset", output_dir=self.path)

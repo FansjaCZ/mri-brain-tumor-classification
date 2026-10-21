@@ -6,6 +6,7 @@ with CONFIG_FILE.open("rb") as f:
     data = tomllib.load(f)
 
 device = data["main"]["device"]
+default_save_dir = data["main"]["default_save_dir"]
 
 dataset_dir = data["data"]["dataset_dir"]
 im_size = data["data"]["image_size"]
