@@ -38,7 +38,7 @@ Evaluating (old) trainings can be done with the `plot_training.py` script. This 
 
 Plotting a graph using the script can be done with the following command.
 ```
-python3 .\scripts\plot_graph.py .\data\saves\<your_training_name>.tar
+python3 .\scripts\plot_training.py .\data\saves\<your_training_name>.tar
 ```
 
 ## Specs
