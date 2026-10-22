@@ -27,7 +27,7 @@ def train_batch(model, data_loader, loss_fn, optimizer):
         optimizer.step()
         optimizer.zero_grad()
 
-def test_batch(model, data_loader, loss_fn, scheduler=None):
+def test_batch(model, data_loader, loss_fn, scheduler):
     model.eval()
     device = utils.get_model_device(model)
 
@@ -42,15 +42,26 @@ def test_batch(model, data_loader, loss_fn, scheduler=None):
             total_correct += (out.argmax(1)==y).type(torch.float).sum().item()
 
     avg_loss = total_loss/len(data_loader)
-    if scheduler:
-        scheduler.step(avg_loss)
+    scheduler.step(avg_loss)
     accuracy = 100*(total_correct/len(data_loader.dataset))
 
-    return avg_loss, accuracy
+    return avg_loss, accuracy, scheduler.get_last_lr()[0]
 
 def get_sate_dict(training_save_path=str):
     save = torch.load(training_save_path)
     return save["model_state_dict"]
+
+def get_accuracy_data(training_save_path=str):
+    save = torch.load(training_save_path)
+    return save["accuracy_history"]
+
+def get_loss_data(training_save_path=str):
+    save = torch.load(training_save_path)
+    return save["avg_loss_history"]
+
+def get_learning_rate_data(training_save_path=str):
+    save = torch.load(training_save_path)
+    return save["learning_rate_history"]
 
 class Trainer():
     def __init__(self, model=Model, optimizer=Optimizer, scheduler=LRScheduler, loss_fn=CrossEntropyLoss, train_dataloader=DataLoader, test_dataloader=DataLoader):
@@ -60,8 +71,9 @@ class Trainer():
         self.loss_fn = loss_fn
         self.train_dataloader = train_dataloader
         self.test_dataloader = test_dataloader
-        self.avg_loss = []
-        self.accuracy = []
+        self.avg_loss_history = []
+        self.accuracy_history = []
+        self.learning_rate_history = []
         self.epoch = 0
 
     def load(self, path=str):
@@ -69,8 +81,9 @@ class Trainer():
         self.model.load_state_dict(save["model_state_dict"])
         self.optimizer.load_state_dict(save["optimizer_state_dict"])
         self.scheduler.load_state_dict(save["scheduler_state_dict"])
-        self.avg_loss = save["avg_loss"]
-        self.accuracy = save["accuracy"]
+        self.avg_loss_history = save["avg_loss_history"]
+        self.accuracy_history = save["accuracy_history"]
+        self.learning_rate_history = save["learning_rate_history"]
         self.epoch = save["epoch"]
 
     def save(self, path=str):
@@ -78,8 +91,9 @@ class Trainer():
             "model_state_dict" : self.model.state_dict(),
             "optimizer_state_dict" : self.optimizer.state_dict(),
             "scheduler_state_dict" : self.scheduler.state_dict(),
-            "avg_loss" : self.avg_loss,
-            "accuracy" : self.accuracy,
+            "avg_loss_history" : self.avg_loss_history,
+            "accuracy_history" : self.accuracy_history,
+            "learning_rate_history" : self.learning_rate_history,
             "epoch" : self.epoch,
         }, path)
 
@@ -89,12 +103,13 @@ class Trainer():
 
             print(f"Epoch {str(self.epoch)} trained")
 
-            avg_loss, accuracy = test_batch(self.model, self.test_dataloader, self.loss_fn, self.scheduler)
+            avg_loss, accuracy, learning_rate = test_batch(self.model, self.test_dataloader, self.loss_fn, self.scheduler)
 
             print(f"Epoch {str(self.epoch)} tested. Loss: {round(avg_loss, config.loss_decimals)}, accuracy: {round(accuracy, config.percentage_decimals)}%, learning rate: {self.optimizer.param_groups[0]["lr"]}")
 
-            self.avg_loss.append(avg_loss)
-            self.accuracy.append(accuracy)
+            self.avg_loss_history.append(avg_loss)
+            self.accuracy_history.append(accuracy)
+            self.learning_rate_history.append(learning_rate)
 
             self.epoch += 1
 

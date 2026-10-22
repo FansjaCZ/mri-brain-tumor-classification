@@ -22,16 +22,23 @@ Set your preferences in `config.toml/`. The initial configuration will function,
 
 The model can be trained using the `train_model.py` script. This will create a training save in the target directory. This training save can also be used to load the model for predictions. A full training save save was already created in `.\data\saves\default.tar`.
 
-To start your own training run the following command on the main directory
+To start your own training run the following command on the main directory.
 ```
 python3 .\scripts\train_model.py .\data\saves\<your_training_name>.tar
 ``` 
 
 To run a prediction, the `use_model.py` script can be applied. This takes two arguments: the path to the image and the path to a training save to load parameters from. The second parameter is optional. By default the default training file will be used (set in the config).
 
-To run a prediction on a test image from the nickparvar dataset run the following command
+To run a prediction on a test image from the nickparvar dataset run the following command.
 ```
 python3 .\scripts\use_model.py .\data\dataset\Testing\meningioma\Te-aug-me_1.jpg .\data\saves\<your_training_name>.tar
+```
+
+Evaluating (old) trainings can be done with the `plot_training.py` script. This script takes the target training save as its argument. This script plots accuracy, avarage loss and the learning rate recorded from the last training. A matplotlib tab will open after running the script.
+
+Plotting a graph using the script can be done with the following command.
+```
+python3 .\scripts\plot_graph.py .\data\saves\<your_training_name>.tar
 ```
 
 ## Specs

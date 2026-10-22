@@ -34,6 +34,8 @@ def main(path=None):
     epoch_start = trainer.epoch
     time_start = time.time()
 
+    print(f"Training {config.epochs-epoch_start} epochs (from epoch {epoch_start} until epoch {config.epochs})")
+
     trainer.train_until(config.epochs)
 
     print(f"Completed {config.epochs-epoch_start} epochs in {round(time.time()-time_start, config.time_decimals)}s")
