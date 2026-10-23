@@ -32,7 +32,7 @@ def main(im_path=str, save_path=None):
 
     im_tensor = dataset.transform(im).unsqueeze(0).to(config.device)
 
-    model = Model(config.im_size)
+    model = Model()
     model.to(config.device)
     model.load_state_dict(get_sate_dict(save_path))
 

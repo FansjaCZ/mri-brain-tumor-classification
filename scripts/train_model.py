@@ -18,7 +18,7 @@ def main(path=None):
     test_dataloader = DataLoader(dataset.get_test(), config.batch_size, True)
     train_dataloader = DataLoader(dataset.get_train(), config.batch_size, True)
 
-    model = Model(config.im_size)
+    model = Model()
     model.to(config.device)
 
     loss_fn = nn.CrossEntropyLoss()

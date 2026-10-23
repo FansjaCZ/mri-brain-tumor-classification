@@ -1,11 +1,12 @@
 from matplotlib import pyplot as plt
 from matplotlib import ticker
 
-from train import get_accuracy_data, get_loss_data, get_learning_rate_data
+from train import get_training_data
 
 import config
 
 from pathlib import Path
+import math
 import sys
 
 def main(save_path=str):
@@ -14,33 +15,36 @@ def main(save_path=str):
         print("Training save path does not exist")
         return
 
-    fig, axs = plt.subplots(1,3)
+    training_data = get_training_data(save_path)
 
     formatter = ticker.ScalarFormatter()
     formatter.set_powerlimits((-3,3))
-    
-    avg_loss = get_loss_data(save_path)
-    axs[0].plot(range(len(avg_loss)), avg_loss, color="tab:red")
-    axs[0].set_ylim(0, max(avg_loss))
-    axs[0].xaxis.set_major_locator(ticker.MultipleLocator(1))
+
+    fig, axs = plt.subplots(1,3)
+
+    axs[0].plot(range(len(training_data["test_loss"])), training_data["test_loss"], label="Evaluation", color="tab:red")
+    axs[0].plot(range(len(training_data["train_loss"])), training_data["train_loss"], label="Training", color="tab:orange")
+    axs[0].legend()
+    axs[0].set_ylim(0, max(training_data["train_loss"]+training_data["test_loss"]))
+    axs[0].xaxis.set_major_locator(ticker.MultipleLocator(math.ceil(len(training_data["test_loss"])/10)))
     axs[0].yaxis.set_major_formatter(formatter)
     axs[0].grid(True)
     axs[0].set_title("Loss over training")
-    axs[0].set(xlabel="Epoch", ylabel="Avarage loss")
+    axs[0].set(xlabel="Epoch", ylabel="Loss")
 
-    accuracy = get_accuracy_data(save_path)
-    axs[1].plot(range(len(accuracy)), accuracy, color="tab:green")
+    axs[1].plot(range(len(training_data["test_accuracy"])), training_data["test_accuracy"], label="Evaluation", color="tab:blue")
+    axs[1].plot(range(len(training_data["train_accuracy"])), training_data["train_accuracy"], label="Training", color="tab:cyan")
+    axs[1].legend()
     axs[1].set_ylim(0, 100)
-    axs[1].xaxis.set_major_locator(ticker.MultipleLocator(1))
+    axs[1].xaxis.set_major_locator(ticker.MultipleLocator(math.ceil(len(training_data["test_accuracy"])/10)))
     axs[1].yaxis.set_major_formatter(formatter)
     axs[1].grid(True)
     axs[1].set_title("Accuracy over training")
-    axs[1].set(xlabel="Epoch", ylabel="Avarage accuracy")
+    axs[1].set(xlabel="Epoch", ylabel="Accuracy")
 
-    learning_rate = get_learning_rate_data(save_path)
-    axs[2].plot(range(len(learning_rate)), learning_rate, color="tab:blue")
-    axs[2].set_ylim(0, max(learning_rate))
-    axs[2].xaxis.set_major_locator(ticker.MultipleLocator(1))
+    axs[2].plot(range(len(training_data["learning_rate"])), training_data["learning_rate"], color="tab:green")
+    axs[2].set_ylim(0, max(training_data["learning_rate"]))
+    axs[2].xaxis.set_major_locator(ticker.MultipleLocator(math.ceil(len(training_data["learning_rate"])/10)))
     axs[2].yaxis.set_major_formatter(formatter)
     axs[2].grid(True)
     axs[2].set_title("Learning rate over training")
@@ -49,7 +53,7 @@ def main(save_path=str):
     plt.tight_layout()
     plt.show()
 
-    print(f"Close the opened matplot lib window to stop the script.")
+    print(f"Close the opened matplot lib windows or stop the script to exit.")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

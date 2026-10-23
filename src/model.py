@@ -1,9 +1,8 @@
 from torch import nn
 
 class Model(nn.Module):
-    def __init__(self, im_size):
+    def __init__(self):
         super().__init__()
-        post_im_size = (im_size[0]/(2**5), im_size[1]/(2**5))
         self.softmax = nn.Softmax(1)
         self.block1 = nn.Sequential(
             nn.Conv2d(1, 16, 3, 1, 1),
@@ -47,15 +46,14 @@ class Model(nn.Module):
             nn.BatchNorm2d(256),
             nn.MaxPool2d(2, 2),
         )
+
         self.global_avarage_pooling_2d = nn.AdaptiveAvgPool2d((1, 1))
         self.flatten = nn.Flatten()
-        #self.block_dense1 = nn.Linear(int(256*post_im_size[0]*post_im_size[1]), 512)
-        self.block_dense1 = nn.Linear(256, 512)
-        self.block_dense2 = nn.Sequential(
-            nn.ReLU(),
-            nn.Dropout(0.005),
-            nn.Linear(512, 4)
-        )
+        
+        self.fc1 = nn.Linear(256, 512)
+        self.ReLU = nn.ReLU()
+        self.dropout = nn.Dropout(0.005)
+        self.fc2 = nn.Linear(512, 4)
 
     def forward(self, x):
         x = self.block1(x)
@@ -63,10 +61,15 @@ class Model(nn.Module):
         x = self.block3(x)
         x = self.block4(x)
         x = self.block5(x)
+
         x = self.global_avarage_pooling_2d(x)
         x = self.flatten(x)
-        x = self.block_dense1(x)
-        x = self.block_dense2(x)
+
+        x = self.fc1(x)
+        x = self.ReLU(x)
+        if self.training:
+            x = self.dropout(x)
+        x = self.fc2(x)
 
         if not self.training:
             x = self.softmax(x)
