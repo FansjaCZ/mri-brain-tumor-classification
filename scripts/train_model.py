@@ -14,9 +14,16 @@ import time
 import sys
 
 def main(path=None):
-    dataset = Nickparvar(config.dataset_dir, config.im_size)
-    test_dataloader = DataLoader(dataset.get_test(), config.batch_size, True)
-    train_dataloader = DataLoader(dataset.get_train(), config.batch_size, True)
+    test_dataloader = DataLoader(
+        Nickparvar(config.dataset_dir, config.im_size, False, config.im_mean, config.im_std),
+        config.batch_size,
+        True
+    )
+    train_dataloader = DataLoader(
+        Nickparvar(config.dataset_dir, config.im_size, True, config.im_mean, config.im_std),
+        config.batch_size,
+        True
+    )
 
     model = Model()
     model.to(config.device)
@@ -24,7 +31,7 @@ def main(path=None):
     loss_fn = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), config.learning_rate)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min", factor=0.4, patience=1)
-
+    
     trainer = Trainer(model, optimizer, scheduler, loss_fn, train_dataloader, test_dataloader)
 
     if path and Path(path).exists():

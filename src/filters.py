@@ -1,4 +1,5 @@
 import numpy as np
+import SimpleITK as sitk
 
 def ensure64(im):
     return np.minimum(im.real.astype(np.float64), 1)
@@ -20,3 +21,11 @@ def hf_2d(rawIm, lowGain=0.6, highGain=2, cutoffMultiplier=1.2):
     pifft = ensure64(np.exp(np.fft.ifft2(np.fft.ifftshift(pfft)).real))
 
     return pifft
+
+def n4(rawIm, corrector=sitk.N4BiasFieldCorrectionImageFilter):
+    sitk_im = sitk.GetImageFromArray(rawIm.astype("float32", copy=False))
+    sitk_mask = sitk.OtsuThreshold(sitk_im, 0, 1)
+
+    sitk_result = corrector.Execute(sitk_im, sitk_mask)
+
+    return sitk.GetArrayFromImage(sitk_result)

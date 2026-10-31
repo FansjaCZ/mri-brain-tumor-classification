@@ -22,8 +22,10 @@ def train_batch(model, data_loader, loss_fn, optimizer):
         out = model(X)
         loss = loss_fn(out, y)
 
-        dense_weights = model.fc1.weight
-        regulated_loss = loss + 1e-5 * dense_weights.abs().sum() + 1e-4 * dense_weights.square().sum()
+        regulated_loss = loss
+        for fc in model.apply_L1_and_L2_on:
+            dense_weights = fc.weight
+            regulated_loss += 1e-5 * dense_weights.abs().sum() + 1e-4 * dense_weights.square().sum()
 
         regulated_loss.backward()
         optimizer.step()

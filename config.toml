@@ -3,8 +3,10 @@ device = "cuda"
 default_save_dir = "data/saves/default.tar"
 
 [data]
-dataset_dir = "data/dataset/"
+dataset_dir = "data/dataset"
 image_size = [224, 224]
+image_mean = 0.1952662616968155
+image_std = 0.04548221081495285
 
 [train]
 batch_size = 8 #8

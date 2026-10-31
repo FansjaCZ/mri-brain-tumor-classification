@@ -2,5 +2,6 @@
 */__pycache__
 *.egg-info
 
-data/dataset/*
-!data/dataset/.gitkeep
+data/dataset
+data/cache/*
+!data/cache/.gitkeep

@@ -3,13 +3,10 @@ from torch import nn
 class Model(nn.Module):
     def __init__(self):
         super().__init__()
-        self.softmax = nn.Softmax(1)
         self.block1 = nn.Sequential(
             nn.Conv2d(1, 16, 3, 1, 1),
             nn.ReLU(),
             nn.Conv2d(16, 16, 3, 1, 1),
-            nn.ReLU(),
-            nn.Conv2d(16, 16, 3, 1, 1, groups=2),
             nn.ReLU(),
             nn.BatchNorm2d(16),
             nn.MaxPool2d(2, 2)
@@ -17,7 +14,7 @@ class Model(nn.Module):
         self.block2 = nn.Sequential(
             nn.Conv2d(16, 32, 3, 1, 1),
             nn.ReLU(),
-            nn.Conv2d(32, 32, 3, 1, 1, groups=2),
+            nn.Conv2d(32, 32, 3, 1, 1),
             nn.ReLU(),
             nn.BatchNorm2d(32),
             nn.MaxPool2d(2, 2),
@@ -25,7 +22,7 @@ class Model(nn.Module):
         self.block3 = nn.Sequential(
             nn.Conv2d(32, 64, 3, 1, 1),
             nn.ReLU(),
-            nn.Conv2d(64, 64, 3, 1, 1, groups=2),
+            nn.Conv2d(64, 64, 3, 1, 1),
             nn.ReLU(),
             nn.BatchNorm2d(64),
             nn.MaxPool2d(2, 2),
@@ -33,7 +30,7 @@ class Model(nn.Module):
         self.block4 = nn.Sequential(
             nn.Conv2d(64, 128, 3, 1, 1),
             nn.ReLU(),
-            nn.Conv2d(128, 128, 3, 1, 1, groups=2),
+            nn.Conv2d(128, 128, 3, 1, 1),
             nn.ReLU(),
             nn.BatchNorm2d(128),
             nn.MaxPool2d(2, 2),
@@ -49,11 +46,16 @@ class Model(nn.Module):
 
         self.global_avarage_pooling_2d = nn.AdaptiveAvgPool2d((1, 1))
         self.flatten = nn.Flatten()
-        
-        self.fc1 = nn.Linear(256, 512)
         self.ReLU = nn.ReLU()
+
+        self.fc1 = nn.Linear(256, 1024)
+        self.fc2 = nn.Linear(1024, 1024)
         self.dropout = nn.Dropout(0.005)
-        self.fc2 = nn.Linear(512, 4)
+        self.fc3 = nn.Linear(1024, 4)
+
+        self.apply_L1_and_L2_on = [self.fc1, self.fc2, self.fc3]
+
+        self.softmax = nn.Softmax(1)
 
     def forward(self, x):
         x = self.block1(x)
@@ -70,6 +72,8 @@ class Model(nn.Module):
         if self.training:
             x = self.dropout(x)
         x = self.fc2(x)
+        x = self.ReLU(x)
+        x = self.fc3(x)
 
         if not self.training:
             x = self.softmax(x)

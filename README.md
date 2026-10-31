@@ -4,6 +4,8 @@ The model can identify four types of brain tumor (glioma tumor, meningioma tumor
 The whole project is written in Python and based on PyTorch. The CNN structure is based on the method proposed in an article by [Rasheed, Z. et al.](https://www.mdpi.com/2076-3425/13/9/1320), where it's stated that the method achieved an accuracy of 97.84%.
 
 ## Setup
+Beware that this program is not properly optimized for all devices. Preprocessing and model predictions and training are heavy tasks, that can sometimes take hours to complete. Please view the specs used to build this project at the bottom of this file, and evaluate if your device fits the requirements. Now lets get to the setup.
+
 First of all, make sure you have python 3.14.x and git installed on your device.
 
 Clone the repository to your target directory with the following command in the terminal:
@@ -34,7 +36,7 @@ To run a prediction on a test image from the nickparvar dataset run the followin
 python3 .\scripts\use_model.py .\data\dataset\Testing\meningioma\Te-aug-me_1.jpg .\data\saves\<your_training_name>.tar
 ```
 
-Evaluating (old) trainings can be done with the `plot_training.py` script. This script takes the target training save as its argument. This script plots accuracy, avarage loss and the learning rate recorded from the last training. A matplotlib tab will open after running the script.
+Evaluating (old) trainings can be done with the `plot_training.py` script. This script takes the target training save as its argument. This script plots accuracy, avarage loss and the learning rate recorded from the last training. A matplotlib window will open after running the script.
 
 Plotting a graph using the script can be done with the following command.
 ```
