@@ -33,6 +33,7 @@ def main(im_path=str, save_path=None):
     model = Model()
     model.to(config.device)
     model.load_state_dict(get_sate_dict(save_path))
+    model.use_softmax = True
 
     print(f"Loaded training from {save_path}")
     

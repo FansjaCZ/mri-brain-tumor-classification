@@ -5,14 +5,13 @@ from torch.utils.data import Dataset
 from torchvision import datasets, transforms
 
 import filters
-import utils
 
 from pathlib import Path
 import time
-import datetime
 import math
 
 SHARD_SIZE = 500
+SHARDS_AT_A_TIME = 6
 
 class BiasCorrection(torch.nn.Module):
     def __init__(self):
@@ -85,13 +84,23 @@ class Nickparvar(Dataset):
         self.classes = metadata["classes"]
         self.size = metadata["size"]
 
-        self._shard_num = -1
-        self._shard = None
+        self._shards = []
+        self._shards_num = []
         
-        self.run_time_transforms = transforms.Compose([
-            transforms.Resize(im_size),
-            transforms.Normalize([mean], [std]),
-        ])
+        if training:
+            self.run_time_transforms = transforms.Compose([
+                transforms.RandomRotation(5),
+                transforms.RandomHorizontalFlip(),
+                #transforms.RandomAffine(0, translate=(0.1, 0.1)),
+                transforms.Resize(im_size),
+                transforms.Normalize([mean], [std]),
+            ])
+        else:
+            self.run_time_transforms = transforms.Compose([
+                transforms.Resize(im_size),
+                transforms.Normalize([mean], [std]),
+            ])
+        
         self.preprocess = transforms.Compose([
             self.raw_transforms,
             self.run_time_transforms,
@@ -103,13 +112,23 @@ class Nickparvar(Dataset):
     def __getitem__(self, index):
         shard_num = index // SHARD_SIZE
         shard_idx = index - shard_num * SHARD_SIZE
-        if self._shard_num != shard_num:
+        if shard_num in self._shards_num:
+            shard_cache_idx = self._shards_num.index(shard_num)
+        else:
+            shard_cache_idx = None
+
+        if not isinstance(shard_cache_idx, int):
             shard_path = self.dir / f"shard_{shard_num:03d}.tar"
             shard = torch.load(shard_path)
-            self._shard_num = shard_num
-            self._shard = shard
+            self._shards.append(shard)
+            self._shards_num.append(shard_num)
+
+            if len(self._shards) > SHARDS_AT_A_TIME:
+                self._shards.pop(0)
+                self._shards_num.pop(0)
+
         else:
-            shard = self._shard
+            shard = self._shards[shard_cache_idx]
 
         if hasattr(self, "run_time_transforms"):
             return self.run_time_transforms(shard["images"][shard_idx]), shard["labels"][shard_idx]

@@ -3,5 +3,5 @@
 *.egg-info
 
 data/dataset
-data/cache/*
-!data/cache/.gitkeep
+data/saves/*
+!data/saves/.gitkeep

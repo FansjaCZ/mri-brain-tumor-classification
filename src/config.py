@@ -16,6 +16,7 @@ im_std = data["data"]["image_std"]
 batch_size = data["train"]["batch_size"]
 epochs = data["train"]["epochs"]
 learning_rate = data["train"]["learning_rate"]
+label_smoothing = data["train"]["label_smoothing"]
 
 loss_decimals = data["format"]["loss_decimals"]
 percentage_decimals = data["format"]["percentage_decimals"]

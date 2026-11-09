@@ -28,12 +28,12 @@ def main(path=None):
     model = Model()
     model.to(config.device)
 
-    loss_fn = nn.CrossEntropyLoss()
+    loss_fn = nn.CrossEntropyLoss(label_smoothing=config.label_smoothing)
     optimizer = optim.Adam(model.parameters(), config.learning_rate)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min", factor=0.4, patience=1)
-    
-    trainer = Trainer(model, optimizer, scheduler, loss_fn, train_dataloader, test_dataloader)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min", factor=0.4, patience=3)
 
+    trainer = Trainer(model, optimizer, scheduler, loss_fn, train_dataloader, test_dataloader)
+    
     if path and Path(path).exists():
         trainer.load(path)
         print(f"Loaded training from {path}")
@@ -41,7 +41,7 @@ def main(path=None):
     epoch_start = trainer.epoch
     time_start = time.time()
 
-    print(f"Training {config.epochs-epoch_start} epochs (from epoch {epoch_start} until epoch {config.epochs})")
+    print(f"Training {config.epochs-epoch_start} epochs (from epoch {epoch_start} until epoch {config.epochs-1})")
 
     trainer.train_until(config.epochs)
 
